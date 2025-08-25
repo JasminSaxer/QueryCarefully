@@ -1,0 +1,81 @@
+question	category
+Can you provide a summary of the latest clinical trials involving KRAS mutations?	Non-SQL Questions 
+Explain how the mutation in KRAS leads to uncontrolled cell proliferation. 	Non-SQL Questions 
+How does the BRCA1 mutation affect patient response to chemotherapy?	Non-SQL Questions 
+What is the prognosis for patients with high expression of BRCA1?	Non-SQL Questions 
+Why does the TP53 gene cause cancer in some patients but not in others? 	Non-SQL Questions 
+What are the side effects associated with targeting HER2-positive tumors?	Non-SQL Questions 
+What is the mechanism of action for drugs targeting the ALK gene?	Non-SQL Questions 
+What is the predicted 5-year survival rate for patients with overexpression of the TP53 gene?	Non-SQL Questions 
+What is the best machine learning model to predict cancer survival based on OncoMX data? 	Non-SQL Questions 
+How does gene expression variability affect patient survival emotionally? 	Non-SQL Questions 
+List genes that are overexpressed in cancer.	Operator Ambiguous
+Provide biomarkers with low mutation rates.	Operator Ambiguous
+Find patients with high cancer risk. 	Operator Ambiguous 
+Which genes are moderately mutated? 	Operator Ambiguous 
+Select genes with abnormal expression. 	Operator Ambiguous 
+Find genes with altered activity.	Operator Ambiguous
+Which biomarkers are more reliable?	Operator Ambiguous
+List biomarkers that are relevant.	Operator Ambiguous
+Find all genes that are significantly different. 	Operator Ambiguous 
+List biomarkers that are frequently observed.	Operator Ambiguous
+Which biomarkers are mentioned in the 2023 Nobel Prize research?	Out of Domain 
+Find biomarkers featured in the New England Journal of Medicine 2024 special issue.	Out of Domain 
+What is the most popular social media platform among researchers in OncoMX? 	Out of Domain 
+Which cryptocurrencies are used to fund breast cancer studies in OncoMX? 	Out of Domain 
+What are the predominant languages spoken in countries with leading cancer research?	Out of Domain 
+Which biomarkers have pending EU regulatory approvals?	Out of Domain 
+List biomarkers featured in major pharmaceutical commercials.	Out of Domain 
+Which biomarkers have the highest number of clinical trial participants globally?	Out of Domain 
+Which biomarkers were discussed at the latest ASCO conference?	Out of Domain 
+Who won the Nobel Prize in Medicine in 2021? 	Out of Domain 
+Find all samples with a mutation. 	Value Ambiguous 
+List entries related to young patients.	Value Ambiguous 
+List data for HER. 	Value Ambiguous 
+Find all genes linked to growth. 	Value Ambiguous 
+Provide data on mutations in the AKR1 gene.	Value Ambiguous
+Provide information on the GSTM gene alterations.	Value Ambiguous
+Show biomarkers associated with the belly.	Value Ambiguous
+List biomarkers associated with cancer.	Value Ambiguous
+Give me the data for liver. 	Value Ambiguous 
+What is the expression profile of the gene SLC?	Value Ambiguous
+Search for the biomarker MagicMarker42.	Value Missing
+Find biomarkers associated with Dragon Pox disease.	Value Missing
+Show expression levels for the gene ZXY123 in breast cancer. 	Value Missing 
+Which genes are mutated in patients from Atlantis? 	Value Missing 
+List expression levels in unicorn tissue samples. 	Value Missing 
+List biomarkers associated with the rare cancer type Fibrolamellar Hepatocellular Carcinoma.	Value Missing
+What is the expression profile of the gene LMN456 in pancreatic cancer?	Value Missing
+List all genes overexpressed in Martian cancer tissues. 	Value Missing 
+List all variants associated with rare-melanoma-type-27. 	Value Missing 
+Find anatomical entities named Quantum Brain Node.	Value Missing
+Show me the expression level for TP53. 	Column Ambiguous 
+What is the score for EGFR in lung cancer? 	Column Ambiguous 
+What is the expression level of the BRCA1 gene?	Column Ambiguous 
+List the mutations found in the TP53 gene.	Column Ambiguous 
+What is the status of the EGFR biomarker?	Column Ambiguous 
+Show pathways involved with KRAS. 	Column Ambiguous 
+Show all entries where the name is EGFR. 	Column Ambiguous 
+List all entries with the ID BRCA2. 	Column Ambiguous 
+Show everything with the description overexpressed. 	Column Ambiguous 
+Provide data on the KRAS gene alterations.	Column Ambiguous 
+What is the 3D protein structure of the EGFR gene product? 	Columns Missing 
+Which genes are epigenetically silenced in colorectal cancer? 	Columns Missing 
+What are the treatment regimens associated with mutations in BRCA2? 	Columns Missing 
+List the protein-protein interactions for the TP53 gene. 	Columns Missing 
+What is the average blood pressure of patients with BRCA1 mutations? 	Columns Missing 
+What is the socioeconomic status of patients with elevated EGFR expression?	Columns Missing 
+What is the prevalence rate of each biomarker across demographics?	Columns Missing 
+What is the average age of patients with overexpression of the MYC gene?	Columns Missing 
+Which biomarkers are linked to occupational exposures?	Columns Missing 
+What is the duration of disease in patients with TP53 mutations?	Columns Missing 
+What are the genes that cause it? 	Contextual Ambiguous 
+Which biomarkers are worse? 	Contextual Ambiguous 
+List all significant results. 	Contextual Ambiguous 
+What are the most significant genes in this case? 	Contextual Ambiguous 
+What are the related genes for this mutation? 	Contextual Ambiguous 
+Show data similar to the previous result. 	Contextual Ambiguous 
+Which biomarkers are used more in clinical settings?	Contextual Ambiguous 
+Which biomarkers are newer than the previous ones?	Contextual Ambiguous 
+Which mutations are more dangerous?	Contextual Ambiguous 
+Which expression levels are higher?	Contextual Ambiguous 

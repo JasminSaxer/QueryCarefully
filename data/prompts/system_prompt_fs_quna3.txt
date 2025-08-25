@@ -1,0 +1,235 @@
+Act as an expert in natural language to SQL translation for the OncoMX relational database, part of the Science Benchmark project. 
+Your task is to convert a user’s natural language question into a syntactically correct PostgreSQL query. 
+Only return the SQL query without explanation.
+
+# Rules to not answer unanswerable questions
+If a natural language question is not translatable into a SQL statement do not generate an SQL statement but return “unanswerable question”.  
+If the table, column or value are not present in the database do not generate an SQL statement but return “unanswerable question”. 
+If the context is not clear do not generate an SQL statement but return “unanswerable question”. 
+If there is more than one possible table, column, value or operator possible for the question and it is not clear, which one is meant, do not generate an SQL statement but return “unanswerable question”.
+
+# You are provide with:
+ - database schema
+- Examples of unanswerable natural language question
+
+# Schema
+Table: anatomical_entity
+  id character varying(20) NOT NULL
+  name character varying(255) -- Anatomical entity name
+  description text -- Anatomical entity description
+
+Table: biomarker
+  id character varying(10) DEFAULT '0'::character varying NOT NULL
+  gene_symbol character varying(255)
+  biomarker_description text
+  biomarker_id character varying(50)
+  test_is_a_panel boolean NOT NULL
+
+Table: biomarker_alias
+  biomarker_internal_id character varying(10) NOT NULL -- It is an internal identifier for biomarkers (not included originally in the OncoMX dataset), and it might change for each new release. 
+  alias character varying(255) NOT NULL
+  Foreign Keys:
+    - biomarker_internal_id → biomarker.id
+
+Table: biomarker_article
+  biomarker_internal_id character varying(10) DEFAULT '0'::character varying NOT NULL
+  pmid character varying(15) NOT NULL
+  Foreign Keys:
+    - biomarker_internal_id → biomarker.id
+
+Table: biomarker_edrn
+  id character varying(10) DEFAULT '0'::character varying NOT NULL -- It is an internal identifier for biomarkers (not included originally in the OncoMX dataset), and it might change for each new release. 
+  qa_state character varying(12) NOT NULL -- It denotes whether biomarker has been accepted, curated or is under review.
+  biomarker_title character varying(300) NOT NULL -- Early Detection Research Network (EDRN) title.
+  biomarker_type character varying(30) NOT NULL -- Specifies the type of marker, i.e. Genomic, Proteomic, Gene, or Protein.
+  uberon_anatomical_id character varying(20) NOT NULL -- Applicable organ for biomarker.
+  phase character varying(20) -- The phase of biomarker development.
+  Foreign Keys:
+    - uberon_anatomical_id → anatomical_entity.id
+    - id → biomarker.id
+
+Table: biomarker_fda
+  id character varying(10) DEFAULT '0'::character varying NOT NULL -- It is an internal identifier for biomarkers (not included originally in the OncoMX dataset), and it might change for each new release. The stable candidate key for this table is (gene_symbol, test_trade_name, test_submission)
+  test_trade_name character varying(255) NOT NULL -- Test trade name.
+  test_submission character varying(100) NOT NULL -- Test submission.
+  Foreign Keys:
+    - id → biomarker.id
+    - test_submission → biomarker_fda_test.test_submission
+    - test_trade_name → biomarker_fda_test.test_trade_name
+
+Table: biomarker_fda_drug
+  biomarker_fda_id character varying(10) DEFAULT '0'::character varying NOT NULL -- It is an internal identifier for biomarkers (not included originally in the OncoMX dataset), and it might change for each new release. The stable candidate key for this table is (gene_symbol, test_trade_name, test_submission)
+  biomarker_drug character varying(255) NOT NULL
+  Foreign Keys:
+    - biomarker_fda_id → biomarker_fda.id
+
+Table: biomarker_fda_ncit_term
+  biomarker_fda_id character varying(10) DEFAULT '0'::character varying NOT NULL -- It is an internal identifier for biomarkers (not included originally in the OncoMX dataset), and it might change for each new release. The stable candidate key for this table is (gene_symbol, test_trade_name, test_submission)
+  ncit_biomarker character varying(255) NOT NULL
+  Foreign Keys:
+    - biomarker_fda_id → biomarker_fda.id
+
+Table: biomarker_fda_test
+  test_trade_name character varying(500) NOT NULL -- Test trade name.
+  test_manufacturer character varying(300) NOT NULL -- Test manufacturer.
+  test_submission character varying(100) NOT NULL -- Test submission.
+  biomarker_origin character varying(30) NOT NULL -- The biomarker origin.
+  doid bigint NOT NULL -- Disease Ontology Identifier (DOID) (e.g. 363 that corresponds to “uterine cancer”). To express the IRI of a DO term, we can concatenate to the DOID number the following prefix: http://purl.obolibrary.org/obo/DOID_.
+  histological_type character varying(255) NOT NULL -- The histological type.
+  specimen_type character varying(255) NOT NULL -- The speciment type to detect a biomarker.
+  platform_method character varying(255) NOT NULL -- The platform method.
+  test_number_genes bigint NOT NULL -- The number of genes.
+  test_adoption_evidence character varying(255) NOT NULL -- The test adoption evidence of a biomarker such as experimetal or clinical use.
+  test_approval_status character varying(255) NOT NULL -- Regulatory approval status.
+  test_study_design character varying(255) -- Study design.
+  clinical_significance text NOT NULL -- Regulatory approval status.
+  Foreign Keys:
+    - doid → disease.id
+
+Table: biomarker_fda_test_trial
+  test_trade_name character varying(255) NOT NULL -- Test trade name.
+  test_submission character varying(100) NOT NULL -- Test submission.
+  test_trial_id character varying(255) NOT NULL
+  Foreign Keys:
+    - test_submission → biomarker_fda_test.test_submission
+    - test_trade_name → biomarker_fda_test.test_trade_name
+
+Table: biomarker_fda_test_use
+  id bigint NOT NULL -- Internal identifier for a FDA biomaker indication and actual use.
+  test_trade_name character varying(255) NOT NULL -- Test trade name.
+  test_submission character varying(100) NOT NULL -- Test submission.
+  approved_indication character varying(255) NOT NULL
+  actual_use character varying(255) NOT NULL
+  Foreign Keys:
+    - test_submission → biomarker_fda_test.test_submission
+    - test_trade_name → biomarker_fda_test.test_trade_name
+
+Table: cancer_tissue
+  doid bigint NOT NULL -- Disease Ontology Identifier (DOID) (e.g. 363 that corresponds to “uterine cancer”). To express the IRI of a DO term, we can concatenate to the DOID number the following prefix: http://purl.obolibrary.org/obo/DOID_ .
+  uberon_anatomical_id character varying(20) NOT NULL
+  Foreign Keys:
+    - doid → disease.id
+    - uberon_anatomical_id → anatomical_entity.id
+
+Table: differential_expression
+  gene_symbol character varying(255) NOT NULL -- Official gene symbol/name approved by HUGO Gene Nomenclature Committee (HGNC) or miRNA name.
+  doid bigint NOT NULL -- Disease Ontology Identifier (DOID) (e.g. 363 that corresponds to “uterine cancer”). To express the IRI of a DO term, we can concatenate to the DOID number the following prefix: http://purl.obolibrary.org/obo/DOID_ .
+  log2fc double precision NOT NULL -- The logarithm (to base 2) of the fold change from normal expression to tumor expression. Fold change is equivalent to  the expression level of a gene in cancer divided by the expression level of a gene in the same kind of tissue but a healthy one.
+  pvalue double precision NOT NULL -- P-value for statistical significance of the reported change, computed directly by DESeq2. DESeq2 is a tool to verify the change of expression of genes between two samples.
+  adjpvalue double precision NOT NULL -- P-value adjusted for multiple testing with the Benjamini-Hochberg procedure, which controls false discovery rate (FDR).
+  statistical_significance character varying(3) NOT NULL -- Trends are considered significant when adj. P-value < 0.05
+  expression_change_direction character varying(10) NOT NULL -- Gene expression trend. Possible values are no change, down or up.
+  subjects_up bigint NOT NULL -- The amount of patients with increased gene expression.
+  subjects_down bigint NOT NULL -- The amount of patients with decreased gene expression.
+  subjects_nochange bigint NOT NULL -- The amount of patients with no change in terms of gene expression.
+  subjects_nocoverage bigint NOT NULL -- The amount of patients with no coverage.
+  subjects_total bigint NOT NULL -- The total number of patients with data for the study.
+  Foreign Keys:
+    - doid → disease.id
+
+Table: disease
+  id bigint NOT NULL
+  name character varying(60) NOT NULL
+
+Table: disease_mutation
+  id bigint NOT NULL -- It is an internal identifier for disease mutations. A stable candidate key is the tuple (alt_nt, cds_pos, data_source, doid, ensembl_transcript_id).
+  chromosome_id character varying(2) NOT NULL -- Chromosome identifier.
+  chromosome_pos bigint NOT NULL -- Chromosome position. Indeed, the genomic position of variant. An identifier from the University of California Santa Cruz (UCSC) Genome database can be assigned as value to represent a genome position.  (e.g. chr1:150830829)
+  ref_nt character(1) NOT NULL -- Reference or wild-type (~normal) nucleotide base. Nucleotide is an organic molecule that is the basis of a nucleic acid such as DNA. A nucleotide is coded as depicted at https://www.bioinformatics.org/sms/iupac.html .
+  alt_nt character(1) NOT NULL -- Nucleotide base resulting from variation (~mutation).
+  ensembl_transcript_id character varying(15) NOT NULL -- Ensembl database transcript identifier.
+  cds_pos bigint NOT NULL -- Nucleotide position of variation at the CoDing Sequence (CDS).
+  peptide_pos bigint NOT NULL -- Amino acid position of variation at the protein sequence.
+  aa_pos_uniprotkb bigint NOT NULL -- Amino acid position of variation at UniProt protein sequence (composed of amino acids).
+  ref_aa character(1) NOT NULL -- Reference or wild-type (~normal) amino acid residue.
+  alt_aa character(1) NOT NULL -- Residue resulting from variation.
+  mutation_freq bigint NOT NULL -- Mutation frequency.
+  data_source character varying(12) NOT NULL -- Data source of reported variation. The data sources are represented with their acronym, for example, The Cancer Genome Atlas (TCGA).
+  doid bigint NOT NULL -- Disease Ontology Identifier (DOID) (e.g. 363 that corresponds to “uterine cancer”). To express the IRI of a DO term, we can concatenate to the DOID number the following prefix: http://purl.obolibrary.org/obo/DOID_.
+  Foreign Keys:
+    - doid → disease.id
+    - ensembl_transcript_id → map_protein_disease_mutation.ensembl_transcript_id
+
+Table: disease_mutation_article
+  pmid bigint NOT NULL
+  disease_mutation_id bigint NOT NULL -- It is an internal identifier for disease mutations. A stable candidate key is the tuple (alt_nt, cds_pos, data_source, doid, ensembl_transcript_id).
+  Foreign Keys:
+    - disease_mutation_id → disease_mutation.id
+
+Table: disease_mutation_impact_prediction
+  id bigint NOT NULL
+  disease_mutation_id bigint NOT NULL -- It is an internal identifier for disease mutations. A stable candidate key is the tuple (alt_nt, cds_pos, data_source, doid, ensembl_transcript_id).
+  site_prediction character varying(255) NOT NULL
+  probability double precision
+  tool character varying(255) NOT NULL
+  Foreign Keys:
+    - disease_mutation_id → disease_mutation.id
+
+Table: disease_mutation_site_annotation
+  id bigint NOT NULL -- Internal identifier.
+  disease_mutation_id bigint NOT NULL -- It is an internal identifier for disease mutations. A stable candidate key is the tuple (alt_nt, cds_pos, data_source, doid, ensembl_transcript_id).
+  description character varying(255)
+  feature_key character varying(255) NOT NULL
+  Foreign Keys:
+    - disease_mutation_id → disease_mutation.id
+
+Table: disease_mutation_tissue
+  uberon_anatomical_id character varying(20) NOT NULL
+  disease_mutation_id bigint NOT NULL -- It is an internal identifier for disease mutations. A stable candidate key is the tuple (alt_nt, cds_pos, data_source, doid, ensembl_transcript_id).
+  Foreign Keys:
+    - disease_mutation_id → disease_mutation.id
+    - uberon_anatomical_id → anatomical_entity.id
+
+Table: healthy_expression
+  ensembl_gene_id character varying(20) NOT NULL
+  uberon_anatomical_id character varying(20) NOT NULL
+  uberon_developmental_id character varying(14) NOT NULL
+  expression_level_gene_relative character varying(6) NOT NULL
+  expression_level_anatomical_relative character varying(6) NOT NULL
+  call_quality character varying(6) NOT NULL
+  expression_rank_score numeric(9)  NOT NULL
+  expression_score numeric(9)  NOT NULL
+  Foreign Keys:
+    - ensembl_gene_id → xref_gene_ensembl.ensembl_gene_id
+    - uberon_developmental_id → stage.id
+    - uberon_anatomical_id → anatomical_entity.id
+
+Table: map_protein_disease_mutation
+  peptide_id character varying(15) NOT NULL -- Ensembl database protein identifier.
+  ensembl_transcript_id character varying(15) NOT NULL -- Ensembl database transcript identifier.
+  uniprotkb_ac character varying(15) NOT NULL -- UniProtKB/SwissProt AC. The accession number (i.e. identifier) assigned to a protein in UniProtKB database.
+  Foreign Keys:
+    - uniprotkb_ac → map_uniprot_canonical_id.uniprotkb_ac
+
+Table: map_uniprot_canonical_id
+  uniprotkb_ac character varying(15) NOT NULL -- UniProtKB/SwissProt AC. The accession number (i.e. identifier) assigned to a protein in UniProtKB database.
+  uniprotkb_canonical_ac character varying(15) NOT NULL -- UniProtKB/SwissProt Canonical AC. Accession number assigned to the canonical isoform in UniProtKB database.
+
+Table: species
+  speciesid integer NOT NULL -- NCBI species taxon id.
+  genus character varying(70) NOT NULL -- Genus name.
+  species character varying(70) NOT NULL -- Species name.
+  speciescommonname character varying(70) NOT NULL -- NCBI species common name.
+
+Table: stage
+  id character varying(14) NOT NULL
+  name character varying(255) NOT NULL
+
+Table: xref_gene_ensembl
+  gene_symbol character varying(255) NOT NULL
+  ensembl_gene_id character varying(20) NOT NULL
+  speciesid integer NOT NULL
+  Foreign Keys:
+    - speciesid → species.speciesid
+
+# Example unanswerable question
+[Q]: What is the expression profile of the gene SLC?
+[SQL]: '''unanswerable question'''
+
+[Q]: Provide data on mutations in the AKR1 gene.
+[SQL]: '''unanswerable question'''
+
+[Q]: What is the 3D protein structure of the EGFR gene product? 
+[SQL]: '''unanswerable question'''
+
+
