@@ -56,7 +56,7 @@ Demo Video
 If you use this code in your research, please cite our paper:
 
 ```bibtex
-[Paper in Review]
+[Paper presented at HC@AIxIA + HYDRA 2025, citation will be updated shortly ](
 ```
 
 ## License
