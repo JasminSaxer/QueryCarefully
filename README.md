@@ -1,6 +1,7 @@
 # Query carefully: Detecting the Unanswerables in NL2SQL
 
-This repository contains the code implementation for the paper on handling unanswerable questions in Natural Language to SQL (NL2SQL) systems.
+This repository contains the code implementation for the paper on handling unanswerable questions in Natural Language to SQL (NL2SQL) systems. 
+Find the preprint on arxiv: [Query Carefully: Detecting the Unanswerables in Text-to-SQL Tasks](https://www.arxiv.org/abs/2512.21345).
 
 ## Overview
 
@@ -56,7 +57,15 @@ Demo Video
 If you use this code in your research, please cite our paper:
 
 ```bibtex
-[Paper presented at HC@AIxIA + HYDRA 2025, citation will be updated shortly ](
+@misc{saxer2025querycarefullydetectingunanswerables,
+      title={Query Carefully: Detecting the Unanswerables in Text-to-SQL Tasks}, 
+      author={Jasmin Saxer and Isabella Maria Aigner and Luise Linzmeier and Andreas Weiler and Kurt Stockinger},
+      year={2025},
+      eprint={2512.21345},
+      archivePrefix={arXiv},
+      primaryClass={cs.DB},
+      url={https://arxiv.org/abs/2512.21345}, 
+}
 ```
 
 ## License
